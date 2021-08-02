@@ -14,17 +14,48 @@ function MovieForm() {
     female_director: false,
   });
 
-  function handleSubmit(e) {
+
+  const [errors, setErrors] = useState([]);
+
+
+  async function handleSubmit(e) {
     e.preventDefault();
-    fetch("/movies", {
-      method: "POST",
+
+      // fetch returns a Promise, we must await it
+    const response = await fetch("/movies", {
+      method: "POST",``
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(formData),
-    })
-      .then((response) => response.json())
-      .then((newMovie) => console.log(newMovie));
+    });  // * pause here because of the await keyword 
+    // response.json() returns a Promise, we must await it
+    const data = await response.json();
+    if (response.ok) {
+      console.log("Movie created:", data);
+    } else {
+      setErrors(data.errors);
+    }
+    // fetch("/movies", {
+    //   method: "POST",
+    //   headers: {
+    //     "Content-Type": "application/json",
+    //   },
+    //   body: JSON.stringify(formData),
+    // })
+    // .then((response) => {
+    //   if (response.ok) {
+    //     response.json().then((newMovie) => console.log(newMovie));
+    //   } else {
+    //     response.json().then((errorData) => setErrors(errorData.errors));
+    //   }
+    // }) 
+    // .then((response) => {
+    //   debugger;
+    //   console.log(response)
+    // });
+    // .then((response) => response.json())
+    // .then((newMovie) => console.log(newMovie));
   }
 
   function handleChange(e) {
@@ -38,6 +69,15 @@ function MovieForm() {
 
   return (
     <Wrapper>
+      {
+        errors.length > 0 && (
+          <ul style={{ color: "red" }}>
+            {errors.map((error) => (
+              <li key={error}>{error}</li>
+            ))}
+          </ul>
+        )
+      }
       <form onSubmit={handleSubmit}>
         <FormGroup>
           <label htmlFor="title">Title</label>
